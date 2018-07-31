@@ -22,66 +22,47 @@ import itertools
 from bs4 import BeautifulSoup
 
 
+### Set variables ###
+
+local_folder = '/Users/lisaoswald/python'
+file_name = 'demo_input.csv'
+
+### Define functions ###
+
+# url construction + web logic in one separate function that can be re-used
+def get_route_and_distance(start, dest):
+    my_url = "https://www.distance.to/" + start + "/" + dest
+    page = requests.get(my_url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    route = soup.find(class_="main-route trip").get_text()
+    dist_calc = soup.find(class_="value km").get_text()
+    return route, dist_calc
+
 ### 1. import csv file ###
 
-#set working directory
-
-os.chdir('/Users/lisaoswald/python')
-
+# set working directory
+os.chdir(local_folder)
 
 # load input data set (csv)
 
-data = pandas.read_csv('demo_input.csv', sep=';', na_values=".")
-data            
-print (data['start'])
-print (data['destination'])
+data = pandas.read_csv(file_name, sep=';', na_values=".")
+print(data['start'])
+print(data['destination'])
 
+### 2.
 
-### 2. build url, request html page content, extract information
+# loop over dataframe rows
+for index, row in data.iterrows():
+    # extract relevant fields from row
+    start = row['start']
+    dest = row['destination']
 
-# version 1
+    # output to console
+    print('Looking up distance from', start, 'to', dest)
 
-for index, start in enumerate(data['start']):
-    print(start)
-    for index, dest in enumerate(data['destination']):
-        print(dest)
-    for index in data:
-        my_url = ("https://www.distance.to/" ,start, "/" ,dest)
-        joined_url = "".join(my_url)
-        page = requests.get(joined_url)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        route = soup.find(class_="main-route trip").get_text()
-        dist_calc = soup.find(class_="value km").get_text()
-        print(route, dist_calc)
-
-# problem: I get result of each dist_calc 25 times (lenght of index)
-        
-# version 2
-for index, start in enumerate(data['start']):
-    for index, dest in enumerate(data['destination']):
-        my_url = ("https://www.distance.to/" ,start, "/" ,dest)
-        joined_url = "".join(my_url)
-        page = requests.get(joined_url)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        route = soup.find(class_="main-route trip").get_text()
-        dist_calc = soup.find(class_="value km").get_text()
-        print(route, dist_calc)
-
-# same problem
-
-        
-# version 3         
-
-for start, dest in itertools.product(data['start'], data['destination']):
-        my_url = ("https://www.distance.to/" ,start, "/" ,dest)
-        joined_url = "".join(my_url)
-        page = requests.get(joined_url)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        route = soup.find(class_="main-route trip").get_text()
-        dist_calc = soup.find(class_="value km").get_text()
-        print(route, dist_calc)
-
-# same here
+    # use the function we defined above to get the route and distance
+    route, dist_calc = get_route_and_distance(start, dest)
+    print(route, dist_calc)
 
     
 # check url requests
