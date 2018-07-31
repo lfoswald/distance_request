@@ -72,7 +72,6 @@ for index, row in data.iterrows():
 
 print(my_df)   
 
-
 # 4. convert pandas df into csv file
 my_df.to_csv('dist_data.csv', sep=',', index=False, encoding='utf-8')
 
