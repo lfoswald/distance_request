@@ -45,6 +45,10 @@ os.chdir(local_folder)
 # load input data set (csv)
 data = pandas.read_csv(file_name, sep=';', na_values=".")
 
+# initialise empty lists for routes and distances
+routes = []
+distances = []
+
 ### 2.
 
 # loop over dataframe rows
@@ -60,15 +64,19 @@ for index, row in data.iterrows():
     route, dist_calc = get_route_and_distance(start, dest)
     print(route, dist_calc)
 
-    # 3. save results in distance column of data frame
-    my_df = pandas.DataFrame({"start": data['start'],
-                              "destination": data['destination'],
-                          
-                              # check if route matches start/destination
-                              "route": route,   
-                          
-                              # actual output
-                              "distance": dist_calc})                     
+    # add these new values to our lists
+    routes.append(route)
+    distances.append(dist_calc)
+
+# 3. save results in distance column of data frame
+my_df = pandas.DataFrame({"start": data['start'],
+                          "destination": data['destination'],
+
+                          # check if route matches start/destination
+                          "route": routes,
+
+                          # actual output
+                          "distance": distances})
 
 print(my_df)   
 
