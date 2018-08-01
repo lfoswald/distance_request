@@ -5,14 +5,13 @@ Created on Tue Jul 31 08:34:09 2018
 
 @author: lisaoswald
 """
+### the plan is ###
 
-### what I want to do ###
-# 1. import csv file 
-# 2. run request on distance calculator website - iterating over rows in csv
-# write request url first (using starts & destinations of csv file)
-# then make actual request
-# extract results with BeautifulSoup
-# 3. save results in new column of csv 
+# 1. define function
+# 2. import csv file 
+# 3. run request on distance calculator website - iterating over rows in csv
+# 4. save results in distance column of data frame
+# 5. convert pandas df into csv file
 
 import requests
 import pandas
@@ -25,7 +24,7 @@ local_folder = '/Users/lisaoswald/python'
 file_name = 'demo_input.csv'
 
 
-### Define functions ###
+### 1. define function ###
 
 # url construction + web logic in one separate function that can be re-used
 def get_route_and_distance(start, dest):
@@ -37,7 +36,7 @@ def get_route_and_distance(start, dest):
     return route, dist_calc
 
 
-### 1. import csv file ###
+### 2. import csv file ###
 
 # set working directory
 os.chdir(local_folder)
@@ -49,7 +48,7 @@ data = pandas.read_csv(file_name, sep=';', na_values=".")
 routes = []
 distances = []
 
-### 2.
+### 3. run request on distance calculator website - iterating over rows in csv ###
 
 # loop over dataframe rows
 for index, row in data.iterrows():
@@ -68,7 +67,8 @@ for index, row in data.iterrows():
     routes.append(route)
     distances.append(dist_calc)
 
-# 3. save results in distance column of data frame
+### 4. save results in distance column of data frame ###
+
 my_df = pandas.DataFrame({"start": data['start'],
                           "destination": data['destination'],
 
@@ -80,7 +80,8 @@ my_df = pandas.DataFrame({"start": data['start'],
 
 print(my_df)   
 
-# 4. convert pandas df into csv file
+### 5. convert pandas df into csv file ###
+
 my_df.to_csv('dist_data.csv', sep=',', index=False, encoding='utf-8')
 
 # check
