@@ -7,20 +7,25 @@ Created on Wed Apr 10 13:41:59 2019
 """
 
 import requests
-import pandas
+import pandas as pd
 import os
 from bs4 import BeautifulSoup
 
 
 ### Set variables ###
 
-local_folder = '/Users/lisaoswald/python'
+local_folder = 'C:/Users/Harald/Downloads'
 file_name = 'data_flyid_2019-04-08_clean.csv'
 
 ### 1.  Define functions ###
 
 # url construction + web logic in one separate function that can be re-used
 def get_route_and_distance(start, dest):
+
+    # if we don't have a start or a destination, no need to look anything up!
+    if pd.isna(start) or pd.isna(dest):
+        return None, None
+
     my_url = "https://www.distance.to/" + start + "/" + dest
     page = requests.get(my_url)
     soup = BeautifulSoup(page.content, 'html.parser')
@@ -31,15 +36,12 @@ def get_route_and_distance(start, dest):
 
 ### 2. import csv file ###
 
-# set working directory
-os.chdir(local_folder)
-
 # load input data set (csv)
-data_full = pandas.read_csv(file_name, encoding = "ISO-8859-1", 
+data_full = pd.read_csv(os.path.join(local_folder, file_name), encoding = "ISO-8859-1", 
                        sep=',', error_bad_lines=False, na_values=".")
 
 # creat data frame only with travel data
-data = pandas.DataFrame({"start1": data_full['FL02x01'],
+data = pd.DataFrame({"start1": data_full['FL02x01'],
                           "destination1": data_full['FL09x01'],
                           "start2": data_full['FL02x02'],
                           "destination2": data_full['FL09x02'],
@@ -136,11 +138,6 @@ data = pandas.DataFrame({"start1": data_full['FL02x01'],
                           })
 
 ## dealing with missing data (no trip)    
-   
-# fill all na with Köln (Distance Köln --> Köln = 0)
-# because Köln == "die schönste Stadt am Rhein <3"
-
-data = data.fillna("Köln")
 
 # initialise empty lists for routes and distances (for all 50 possible trips - past and planned)
 
@@ -916,9 +913,9 @@ my_df = pandas.DataFrame({
 print(my_df)   
 
 # 5. convert pandas df into csv file
-my_df.to_csv('flight_data_1.csv', sep=',', index=False, encoding='utf-8')
+my_df.to_csv(os.path.join(local_folder, 'flight_data_1.csv'), sep=',', index=False, encoding='utf-8')
 
 # check
-data = pandas.read_csv('flight_data_1.csv', sep=',', na_values=".")
+data = pd.read_csv(os.path.join(local_folder, 'flight_data_1.csv'), sep=',', na_values=".")
 print(data)    
 
